@@ -189,6 +189,47 @@ Connection.prototype.send = function(message) {
   return this._websocketConnection.send(message);
 };
 
+Connection.prototype.requestServerInfo = function() {
+  return this.sendWithTransaction({ janus: "info" });
+}
+
+/**
+ * @param {Object} options
+ * @returns {Promise}
+ * @fulfilled {JanusMessage}
+ */
+Connection.prototype.sendWithTransaction = function(options) {
+  var transactionId = Transaction.generateRandomId();
+  var transaction = new Transaction(transactionId, function(incomeMessage) {
+    var errorMessage = incomeMessage.getError();
+    if (!errorMessage) {
+      return Promise.resolve(incomeMessage);
+    }
+    var error = new JanusError(incomeMessage);
+    return Promise.reject(error);
+  });
+  var message = {
+    janus: 'message',
+    transaction: transactionId
+  };
+  Helpers.extend(message, options);
+
+  this.addTransaction(transaction);
+  var sendPromise = this.sendSync(message);
+
+  return new Promise(function(resolve, reject) {
+
+    transaction.promise.catch(function(e) {
+      reject(e);
+    });
+    sendPromise.then(function(r) {
+      resolve(r);
+    }).catch(function(e) {
+      reject(e);
+    })
+  });
+}
+
 /**
  * @param {Object} message
  * @returns {Promise}
