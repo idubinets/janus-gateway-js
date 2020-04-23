@@ -1,13 +1,13 @@
 {
   "name": "janus-gateway-js",
   "description": "Core concepts for Janus javascript client",
-  "version": "2.0.1",
-  "author": "Cargomedia",
+  "version": "2.0.2",
+  "author": "Cargomedia and Ivan Dubynets",
   "license": "MIT",
   "main": "src/index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:cargomedia/janus-gateway-js.git"
+    "url": "git@github.com:idubinets/janus-gateway-js.git"
   },
   "scripts": {
     "build": "npm install && $(npm bin)/gulp",
