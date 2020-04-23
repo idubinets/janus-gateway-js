@@ -12,6 +12,21 @@ describe('Client tests', function() {
     assert.deepEqual(client._options, {foo: 'bar'});
   });
 
+  it('creates an opened connection with real server', function(done) {
+    if (process.env.JANUS_URL) {
+      var client = new Client(process.env.JANUS_URL, { keepalive: true });
+      let connection = null;
+      client.createConnection('123')
+        .then(function(conn) {
+          connection = conn;
+
+          connection.requestServerInfo().then(res => {
+            assert.notEqual(res.get('server-name'), "");
+            done()
+          }).catch(done);
+        })
+    }
+  });
 
   it('creates an opened connection', function(done) {
     var client = new Client('', {});
@@ -36,4 +51,5 @@ describe('Client tests', function() {
         Connection.create.restore();
       });
   });
+
 });
